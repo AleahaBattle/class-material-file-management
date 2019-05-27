@@ -74,7 +74,8 @@ def create(ctx, name, category, description, due_on):
 @click.option('-c', '--category', default='general')
 @click.pass_context
 def complete(ctx, name, category):
-    pass
+    manager = ctx.obj['manager']
+    manager.done(name, category
 
 
 if __name__ == '__main__':
