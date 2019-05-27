@@ -10,21 +10,36 @@ from todos import TodoManager
 
 TESTING_PATH = '__todos_testing'
 
+# all 3 of the following fixtures will be a foundation for non fixture tests
+# we can call upon these 3 fixtures to have a sort of 'setup' for our tests
+
+
+# A path object will be created with the TESTING_PATH set up (but we need our 
+# todos.py __init__ to actually create it as a dir)
 
 @pytest.fixture
 def path():
     return Path(TESTING_PATH)
 
 
+# path object will mkdir ('__todos_testing' dir)
+
 @pytest.fixture
 def todos_dir_empty(path):
     path.mkdir()
 
+    # essentially functions as return
     yield path
 
+    # clean up - removes everything in the directory
     shutil.rmtree(str(path.absolute()))
 
-
+    
+# we add json files to the new created  '__todos_testing' dir
+# '__todos_testing'
+#      -programming.json
+#      -reviews.json
+    
 @pytest.fixture
 def todos_with_categories(todos_dir_empty):
     cat1 = todos_dir_empty / 'programming.json'
@@ -60,6 +75,11 @@ def todos_with_categories(todos_dir_empty):
     return todos_dir_empty
 
 
+# within each test, it is a blank slate (path does'nt exist (yet!))
+# our __init__ will define the path as an actual dir (making it exist)
+# also note, we pass in 'path' as a parameter which is one of the 
+# fixtures above
+
 def test_todos_dir_is_created(path):
     assert not path.exists()
 
@@ -70,7 +90,10 @@ def test_todos_dir_is_created(path):
     # Clean up
     shutil.rmtree(str(path.absolute()))
 
-
+    
+# combine both programming.json/reviews.json into central todos
+# reformat category_name value to be the key of below todos dict
+    
 def test_todo_list_status_all(todos_with_categories):
     manager = TodoManager(TESTING_PATH)
     todos = manager.list()
@@ -94,6 +117,8 @@ def test_todo_list_status_all(todos_with_categories):
         }]
     }
 
+    
+# filter for status 'pending'
 
 def test_todo_list_status_pending(todos_with_categories):
     manager = TodoManager(TESTING_PATH)
@@ -113,6 +138,8 @@ def test_todo_list_status_pending(todos_with_categories):
         }]
     }
 
+    
+# filter for status 'done'    
 
 def test_todo_list_status_done(todos_with_categories):
     manager = TodoManager(TESTING_PATH)
